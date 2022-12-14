@@ -3,7 +3,7 @@ FOS
 
 ## Table of Contents
 1. [General Info](#general-info)
-2. [Collaboration](#collaboration)
+2. [Collaboration](#Team-Members)
 
 ### General Info
 ***
