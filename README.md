@@ -8,8 +8,11 @@ FOS
 ### General Info
 ***
 This's a OS project for the year 2022 at the Faculty of Computers and Information, Ain Shams
+
 Under the supervision Dr, Ahmed Salah
+
 In this project we created 
+
 1. Dynamic Allocator
     1. initialize mem blocks list
     2. find a block with start virtual address
