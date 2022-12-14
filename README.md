@@ -35,11 +35,16 @@ In this project we created
 8. Implement SEMAPHORES to enable OS to protect processes’ shared variables
 
 
-### Collaboration
+### Team Members
 ***
 | Name  | Account |
 | ----- | ------- |
-| Mina Nabil  | <a href="[doc:introduction](https://github.com/minasanta/)" target="_blank">minasanta</a> |
-<a href="https://github.com/minasanta/OS_project_2022-FOS-/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=minasanta/OS_project_2022-FOS-" />
+| Mina Nabil  | @<a href="https://github.com/minasanta/" target="_blank">minasanta</a> |
+| Mehrael Ashraf  | @<a href="https://github.com/Mehrael/" Mina927="_blank">Mehrael</a> |
+| Mina Adil  | @<a href="https://github.com/minasanta/" Mina927="_blank">Mina927</a> |
+| Filobateer Essam  | @<a href="https://github.com/FilobateerEssam/" target="_blank">FilobateerEssam</a> |
+| Martina Sabry  | ___ |
+| Marlen Tawadrous  | ___ |
+<a href="https://github.com/minasanta/">
+  <img src="https://contrib.rocks/image?repo=minasanta/mango_android_app" />
 </a> 
