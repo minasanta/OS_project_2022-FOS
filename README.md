@@ -39,8 +39,7 @@ In this project we created
 ***
 | Name  | Account |
 | ----- | ------- |
-| Mina Nabil  | @minasanta |
-| Content Cell  | Content Cell  |
+| Mina Nabil  | <a href="[doc:introduction](https://github.com/minasanta/)" target="_blank">minasanta</a> |
 <a href="https://github.com/minasanta/OS_project_2022-FOS-/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=minasanta/OS_project_2022-FOS-" />
 </a> 
