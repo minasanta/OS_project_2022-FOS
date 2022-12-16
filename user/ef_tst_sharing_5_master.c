@@ -17,10 +17,9 @@ _main(void)
 		}
 		if (fullWS) panic("Please increase the WS size");
 	}
-
-	cprintf("************************************************\n");
-	cprintf("MAKE SURE to have a FRESH RUN for this test\n(i.e. don't run any program/test before it)\n");
-	cprintf("************************************************\n\n\n");
+	/*Dummy malloc to enforce the UHEAP initializations*/
+	malloc(0);
+	/*=================================================*/
 
 	int envID = sys_getenvid();
 
@@ -48,14 +47,15 @@ _main(void)
 		env_sleep(3000);
 
 		//to ensure that the slave environments completed successfully
-		if (gettst()!=2) panic("test failed");
+		while (gettst()!=2) ;// panic("test failed");
 
+		freeFrames = sys_calculate_free_frames() ;
 		sfree(x);
 		cprintf("Master env removed x (1 page) \n");
 		int diff = (sys_calculate_free_frames() - freeFrames);
-		if ( diff !=  0) panic("Wrong free: revise your freeSharedObject logic\n");
+		if ( diff != (1+1+2)) panic("Wrong free: revise your freeSharedObject logic. diff = %d, expected = %d\n", diff, (1+1+2));
 	}
-	cprintf("Step A completed successfully!!\n\n\n");
+	cprintf("Step A is finished!!\n\n\n");
 
 	cprintf("STEP B: checking free of 2 shared objects ... \n");
 	{
@@ -88,11 +88,11 @@ _main(void)
 
 		if (diff !=  1) panic("Wrong free: frames removed not equal 1 !, correct frames to be removed are 1:\nfrom the env: 1 table\nframes_storage of z & x: should NOT cleared yet (still in use!)\n");
 
-		//To indicate that it's completed successfully
-		inctst();
-
 		int* finish_children = smalloc("finish_children", sizeof(int), 1);
 		*finish_children = 0;
+
+		//To indicate that it's completed successfully
+		inctst();
 
 		if (sys_getparentenvid() > 0) {
 			while(*finish_children != 1);

@@ -265,9 +265,6 @@ int getSizeOfSharedObject(int32 ownerID, char* shareName)
 //=========================
 // [1] Create Share Object:
 //=========================
-//=========================
-// [1] Create Share Object:
-//=========================
 int createSharedObject(int32 ownerID, char* shareName, uint32 size, uint8 isWritable, void* virtual_address)
 {
 	//TODO: [PROJECT MS3] [SHARING - KERNEL SIDE] createSharedObject()
@@ -313,7 +310,7 @@ int createSharedObject(int32 ownerID, char* shareName, uint32 size, uint8 isWrit
 		allocate_frame(&frame);
 		map_frame(myenv->env_page_directory, frame,va,PERM_USER| PERM_WRITEABLE);
 		add_frame_to_storage(sharedObject->framesStorage, frame, i);
-//		frame->environment->ptr_sharing_variables->
+		frame->va = va;
 		s -= PAGE_SIZE;
 		va += PAGE_SIZE;
 		i++;
@@ -349,23 +346,21 @@ int getSharedObject(int32 ownerID, char* shareName, void* virtual_address)
 
 	int sharedID = get_share_object_ID(ownerID, shareName);
 	if(sharedID == E_SHARED_MEM_NOT_EXISTS)
-	{
 		return E_SHARED_MEM_NOT_EXISTS;
-	}
 
 	uint32 va = (uint32) virtual_address;
 	for(int i = 0 ; ;i++)
 	{
 		struct FrameInfo *frame = get_frame_from_storage(shares[sharedID].framesStorage, i);
 		if(frame == NULL)
-		{
 			break;
-		}
+
 		if(shares[sharedID].isWritable)
 			map_frame(myenv->env_page_directory, frame,va,PERM_USER| PERM_WRITEABLE);
 		else
 			map_frame(myenv->env_page_directory, frame,va,PERM_USER);
-		va+=PAGE_SIZE;
+
+			va+=PAGE_SIZE;
 	}
 	shares[sharedID].references++;
 	return sharedID;
@@ -383,7 +378,7 @@ int freeSharedObject(int32 sharedObjectID, void *startVA)
 {
 	//TODO: [PROJECT MS3 - BONUS] [SHARING - KERNEL SIDE] freeSharedObject()
 	// your code is here, remove the panic and write your code
-	panic("freeSharedObject() is not implemented yet...!!");
+//	panic("freeSharedObject() is not implemented yet...!!");
 
 	struct Env* myenv = curenv; //The calling environment
 
@@ -392,12 +387,56 @@ int freeSharedObject(int32 sharedObjectID, void *startVA)
 	// RETURN:
 	//	a) 0 if success
 	//	b) E_SHARED_MEM_NOT_EXISTS if the shared object is not exists
-
 	// Steps:
 	//	1) Get the shared object from the "shares" array (use get_share_object_ID())
+	int sharedID = get_share_object_ID(shares[sharedObjectID].ownerID, shares[sharedObjectID].name);
+	if(sharedID == E_SHARED_MEM_NOT_EXISTS)
+		return E_SHARED_MEM_NOT_EXISTS;
+	uint32 va = (uint32) startVA;
+	uint32 va2 = va;
 	//	2) Unmap it from the current environment "myenv"
+	uint32 s = shares[sharedID].size;
+	while(s > 0)
+	{
+		unmap_frame(myenv->env_page_directory, va2);
+		s -= PAGE_SIZE;
+		va2 += PAGE_SIZE;
+	}
 	//	3) If one or more table becomes empty, remove it
+	uint32 start_tables = ROUNDDOWN(va, PAGE_SIZE*1024);
+	uint32 end_tables = ROUNDUP(va + shares[sharedID].size, PAGE_SIZE*1024);
+	for (uint32 i = start_tables; i < end_tables; i += PAGE_SIZE*1024)
+	{
+		bool found = 0;
+		uint32 * ptr_page_table= NULL;
+		get_page_table(myenv->env_page_directory, i, &ptr_page_table);
+		if(ptr_page_table != NULL)
+		{
+			for(int j = i; j < i + 1024*PAGE_SIZE; j+=PAGE_SIZE)
+			{
+
+				struct FrameInfo *fr = get_frame_info(myenv->env_page_directory, j, &ptr_page_table);
+				if (fr != NULL)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if(found == 0)
+			{
+				kfree((void *) kheap_virtual_address(myenv->env_page_directory[PDX(i)]));
+				myenv->env_page_directory[PDX(i)] = 0;
+			}
+		}
+	}
 	//	4) Update references
+	shares[sharedID].references--;
 	//	5) If this is the last share, delete the share object (use free_share_object())
+	if (shares[sharedID].references == 0)
+	{
+		free_share_object(sharedID);
+	}
 	//	6) Flush the cache "tlbflush()"
+	tlbflush();
+	return 0;
 }

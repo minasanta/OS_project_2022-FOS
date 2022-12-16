@@ -403,14 +403,16 @@ void env_run(struct Env *e)
 //
 void env_free(struct Env *e)
 {
-	/********DON'T CHANGE THIS LINE***********/
+	/*******DON'T CHANGE THIS LINE**********/
 #if USE_KHEAP
 	unshare_pws_at_user_space(e);
 #endif
 	/*****************************************/
 	//TODO: [PROJECT MS3 - BONUS] [EXIT ENV] env_free
 	// your code is here, remove the panic and write your code
-	// panic("env_free() is not implemented yet...!!");
+//	panic("env_free() is not implemented yet...!!");
+
+	// [1] [NOT REQUIRED] [If BUFFERING is Enabled] Un-buffer any BUFFERED page belong to this environment from the free/modified lists
 	// [2] Free the pages in the PAGE working set from the main memory
 	for(int i = 0; i < e->page_WS_max_size; i++)
 	{
@@ -418,14 +420,30 @@ void env_free(struct Env *e)
 		env_page_ws_clear_entry(e, i);
 	}
 	// [3] free the PAGE working set itself from the main memory
-
+	kfree((void*) e->ptr_pageWorkingSet);
 	// [4] free the MemBlockNodes array of the USER HEAP dynamic allocator [if exists]
+
 	// [5] Free Shared variables [if any]
 	// [6] Free Semaphores [if any]
 	// [7] Free all TABLES from the main memory
+	for (uint32 i = 0; i < USER_TOP; i += PAGE_SIZE*1024)
+	{
+		bool found = 0;
+		uint32 * ptr_page_table= NULL;
+		get_page_table(e->env_page_directory, i, &ptr_page_table);
+		if(ptr_page_table != NULL)
+		{
+			for(int j = i; j < i + 1024*PAGE_SIZE; j+=PAGE_SIZE)
+			{
+				kfree((void *) kheap_virtual_address(e->env_page_directory[PDX(i)]));
+				e->env_page_directory[PDX(i)] = 0;
+			}
+		}
+	}
 	// [8] free the page DIRECTORY from the main memory
-
+	kfree((void*) e->env_page_directory);
 	// [9] remove this program from the page file
+//	pf_remove_env_page(e,e->en)
 	/*(ALREADY DONE for you)*/
 	pf_free_env(e); /*(ALREADY DONE for you)*/ // (removes all of the program pages from the page file)
 	/*========================*/

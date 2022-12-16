@@ -17,6 +17,9 @@ _main(void)
 		}
 		if (fullWS) panic("Please increase the WS size");
 	}
+	/*Dummy malloc to enforce the UHEAP initializations*/
+	malloc(0);
+	/*=================================================*/
 
 	cprintf("************************************************\n");
 	cprintf("MAKE SURE to have a FRESH RUN for this test\n(i.e. don't run any program/test before it)\n");
@@ -37,7 +40,7 @@ _main(void)
 		if ((freeFrames - sys_calculate_free_frames()) ==  0+0+2) panic("Wrong free: make sure that you free the shared object by calling free_share_object()");
 		else if ((freeFrames - sys_calculate_free_frames()) !=  0) panic("Wrong free: revise your freeSharedObject logic");
 	}
-	cprintf("Step A completed successfully!!\n\n\n");
+	cprintf("Step A is finished!!\n\n\n");
 
 
 	cprintf("STEP B: checking free of 2 shared objects ... \n");
@@ -58,7 +61,7 @@ _main(void)
 		if ((freeFrames - sys_calculate_free_frames()) !=  0) panic("Wrong free: check your logic");
 
 	}
-	cprintf("Step B completed successfully!!\n\n\n");
+	cprintf("Step B is finished!!\n\n\n");
 
 	cprintf("STEP C: checking range of loop during free... \n");
 	{
@@ -101,9 +104,9 @@ _main(void)
 		sfree(u);
 		if ((freeFrames - sys_calculate_free_frames()) !=  0) panic("Wrong free: check your logic");
 	}
-	cprintf("Step C completed successfully!!\n\n\n");
+	cprintf("Step C is finished!!\n\n\n");
 
-	cprintf("Congratulations!! Test of freeSharedObjects [4] completed successfully!!\n\n\n");
+	cprintf("Test of freeSharedObjects [4] is finished!!\n\n\n");
 
 	int32 parentenvID = sys_getparentenvid();
 	if(parentenvID > 0)

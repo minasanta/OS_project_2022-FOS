@@ -32,10 +32,10 @@ _main(void)
 	if ((sys_calculate_free_frames() - freeFrames) !=  4) panic("wrong free: frames removed not equal 4 !, correct frames to be removed are 4:\nfrom the env: 1 table + 1 frame for z\nframes_storage of z: should be cleared now\n");
 
 	//to ensure that the other environments completed successfully
-	if (gettst()!=2) panic("test failed");
+	while (gettst()!=2) ;// panic("test failed");
 
-	cprintf("Step B completed successfully!!\n\n\n");
-	cprintf("Congratulations!! Test of freeSharedObjects [5] completed successfully!!\n\n\n");
+	cprintf("Step B is finished!!\n\n\n");
+	cprintf("Test of freeSharedObjects [5] is finished!!\n\n\n");
 
 	int32 parentenvID = sys_getparentenvid();
 	if(parentenvID > 0)

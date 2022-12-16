@@ -18,6 +18,10 @@ _main(void)
 		}
 		if (fullWS) panic("Please increase the WS size");
 	}
+	/*Dummy malloc to enforce the UHEAP initializations*/
+	malloc(0);
+	/*=================================================*/
+
 	uint32 *x, *y, *z ;
 
 	//x: Readonly
@@ -58,13 +62,13 @@ _main(void)
 	env_sleep(15000) ;
 
 	//to ensure that the slave environments completed successfully
-	if (gettst()!=3) panic("test failed");
+	while (gettst()!=3) ; //panic("test failed");
 
 
 	if (*z != 30)
 		panic("Error!! Please check the creation (or the getting) of shared 2variables!!\n\n\n");
 	else
-		cprintf("Congratulations!! Test of Shared Variables [Create & Get] [2] completed successfully!!\n\n\n");
+		cprintf("test sharing 2 [Create & Get] is finished!!\n\n\n");
 
 
 	if (sys_getparentenvid() > 0) {

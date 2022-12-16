@@ -33,7 +33,7 @@ void initialize_dyn_block_system()
 	    //panic("initialize_dyn_block_system() is not implemented yet...!!");
 
 	  uint32 MemBlock_size = ROUNDUP(NUM_OF_UHEAP_PAGES * sizeof(struct MemBlock),PAGE_SIZE);
-	  uint32 Uheap_size = USER_HEAP_MAX - USER_HEAP_START;
+	    uint32 Uheap_size = USER_HEAP_MAX - USER_HEAP_START;
 
 	  //[1] Initialize two lists (AllocMemBlocksList & FreeMemBlocksList) [Hint: use LIST_INIT()]
 	    LIST_INIT(&AllocMemBlocksList);
@@ -43,7 +43,7 @@ void initialize_dyn_block_system()
 	    //      (remember to set MAX_MEM_BLOCK_CNT with the chosen size of the array)
 	    MAX_MEM_BLOCK_CNT = NUM_OF_UHEAP_PAGES ;
 	    MemBlockNodes = (void*) USER_DYN_BLKS_ARRAY;
-	    sys_allocate_chunk(USER_DYN_BLKS_ARRAY, MemBlock_size,PERM_USER | PERM_WRITEABLE);
+	   sys_allocate_chunk(USER_DYN_BLKS_ARRAY, MemBlock_size,PERM_USER | PERM_WRITEABLE);
 
 	   //[3] Initialize AvailableMemBlocksList by filling it with the MemBlockNodes
 
@@ -51,57 +51,54 @@ void initialize_dyn_block_system()
 
 	   //[4] Insert a new MemBlock with the heap size into the FreeMemBlocksList
 	    struct MemBlock *free = LIST_FIRST(&AvailableMemBlocksList);
-	    free->size = Uheap_size ;
-		free->sva = USER_HEAP_START;
+	       free->size = Uheap_size ;
+	        free->sva = USER_HEAP_START;
 
-	    LIST_REMOVE(&AvailableMemBlocksList, free);
+	       LIST_REMOVE(&AvailableMemBlocksList, free);
 
-	    LIST_INSERT_HEAD(&FreeMemBlocksList, free);
+	       LIST_INSERT_HEAD(&FreeMemBlocksList, free);
 
 }
 
 //=================================
 // [2] ALLOCATE SPACE IN USER HEAP:
 //=================================
-
 void* malloc(uint32 size)
 {
-	//==============================================================
-	//DON'T CHANGE THIS CODE========================================
-	InitializeUHeap();
-	if (size == 0) return NULL ;
-	//==============================================================
-	//==============================================================
+    //==============================================================
+    //DON'T CHANGE THIS CODE========================================
+    InitializeUHeap();
+    if (size == 0) return NULL ;
+    //==============================================================
+    //==============================================================
 
-	//TODO: [PROJECT MS3] [USER HEAP - USER SIDE] malloc
-	// your code is here, remove the panic and write your code
-	//panic("malloc() is not implemented yet...!!");
-
-	// Steps:
-	//	1) Implement FF strategy to search the heap for suitable space
-	//		to the required allocation size (space should be on 4 KB BOUNDARY)
-	size = ROUNDUP(size, PAGE_SIZE);
+    //TODO: [PROJECT MS3] [USER HEAP - USER SIDE] malloc
+    // your code is here, remove the panic and write your code
+    //panic("malloc() is not implemented yet...!!");
 
 
-	//	2) if no suitable space found, return NULL
-	uint32 va = LIST_FIRST(&FreeMemBlocksList)->sva;
-		if (USER_HEAP_MAX-va< size )
-			return (void *) NULL;
-	// 	3) Return pointer containing the virtual address of allocated space,
-	//
-		else if (sys_isUHeapPlacementStrategyFIRSTFIT() == 1)
-		{
-			struct MemBlock* block = alloc_block_FF(size);
-			if (block != NULL) {
-				insert_sorted_allocList(block);
-				va = block->sva;
-				return (void *) block->sva;
-		}
-	//Use sys_isUHeapPlacementStrategyFIRSTFIT()... to check the current strategy
+    // Steps:
+    //    1) Implement FF strategy to search the heap for suitable space
+    //        to the required allocation size (space should be on 4 KB BOUNDARY)
+    size = ROUNDUP(size, PAGE_SIZE);
+
+    //    2) if no suitable space found, return NULL
+    uint32 va = LIST_FIRST(&FreeMemBlocksList)->sva;
+        if (USER_HEAP_MAX-va< size )
+            return (void *) NULL;
+    //     3) Return pointer containing the virtual address of allocated space,
+    //
+        else if (sys_isUHeapPlacementStrategyFIRSTFIT() == 1) {
+                struct MemBlock* block = alloc_block_FF(size);
+                if (block != NULL) {
+                    insert_sorted_allocList(block);
+                    va = block->sva;
+                    return (void *) block->sva;
+                }
+    //Use sys_isUHeapPlacementStrategyFIRSTFIT()... to check the current strategy
 }
-		return (void*)NULL;
+        return (void*)NULL;
 }
-
 //=================================
 // [3] FREE SPACE FROM USER HEAP:
 //=================================
@@ -113,32 +110,32 @@ void* malloc(uint32 size)
 //	We can use sys_free_user_mem(uint32 virtual_address, uint32 size); which
 //		switches to the kernel mode, calls free_user_mem() in
 //		"kern/mem/chunk_operations.c", then switch back to the user mode here
-//	the free_user_mem function is empty, make sure to implement it.
+//	the free_user_mem function is empty, make sure to implement it
 void free(void* virtual_address)
 {
     //TODO: [PROJECT MS3] [USER HEAP - USER SIDE] free
     // your code is here, remove the panic and write your code
     //panic("free() is not implemented yet...!!");
-	struct MemBlock *block = find_block(&AllocMemBlocksList, (uint32 )virtual_address);
-	if (block != NULL)
-	{
-		sys_free_user_mem((uint32)virtual_address, block->size);
-		LIST_REMOVE(&AllocMemBlocksList, block);
-		insert_sorted_with_merge_freeList(block);
-	}
+    struct MemBlock *block = find_block(&AllocMemBlocksList, (uint32 )virtual_address);
+    if (block != NULL)
+    {
+        sys_free_user_mem((uint32)virtual_address, block->size);
+        LIST_REMOVE(&AllocMemBlocksList, block);
+        insert_sorted_with_merge_freeList(block);
+    }
 
     //you should get the size of the given allocation using its address
     //you need to call sys_free_user_mem()
     //refer to the project presentation and documentation for details
 }
 
+//=================================
+// [4] ALLOCATE SHARED VARIABLE:
+//=================================
 
-//=================================
-// [4] ALLOCATE SHARED VARIABLE:
-//=================================
-//=================================
-// [4] ALLOCATE SHARED VARIABLE:
-//=================================
+uint32 index = 0;
+uint32 VAs[1024];
+uint32 sharedObjectIDs[1024];
 void* smalloc(char *sharedVarName, uint32 size, uint8 isWritable)
 {
 	//==============================================================
@@ -147,39 +144,49 @@ void* smalloc(char *sharedVarName, uint32 size, uint8 isWritable)
 	if (size == 0) return NULL ;
 	//==============================================================
 
-	// TODO: [PROJECT MS3] [SHARING - USER SIDE] smalloc()
+	//TODO: [PROJECT MS3] [SHARING - USER SIDE] smalloc()
 	// Write your code here, remove the panic and write your code
-	// panic("smalloc() is not implemented yet...!!");
+//	panic("smalloc() is not implemented yet...!!");
 	// Steps:
+
 	size = ROUNDUP(size, PAGE_SIZE);
-	//2) if no suitable space found, return NULL
+	//	2) if no suitable space found, return NULL
 	uint32 va = LIST_FIRST(&FreeMemBlocksList)->sva;
 	if (USER_HEAP_MAX-va< size )
-	{
 		return (void *) NULL;
-	}
-	// Else,
+	//	 Else,
+
 	//	1) Implement FIRST FIT strategy to search the heap for suitable space
-	//	to the required allocation size (space should be on 4 KB BOUNDARY)
-	struct MemBlock* block = alloc_block_FF(size);
-	if (block != NULL)
-	{
-		va = block->sva;
+	//		to the required allocation size (space should be on 4 KB BOUNDARY)
+
+	else if (sys_isUHeapPlacementStrategyFIRSTFIT() == 1) {
+			struct MemBlock* block = alloc_block_FF(size);
+			if (block != NULL) {
+				va = block->sva;
+
 	//	3) Call sys_createSharedObject(...) to invoke the Kernel for allocation of shared variable
-	//	sys_createSharedObject(): if succeed, it returns the ID of the created variable. Else, it returns -ve
-		int x = sys_createSharedObject(sharedVarName,size,isWritable, (void*)block->sva);
+	//		sys_createSharedObject(): if succeed, it returns the ID of the created variable. Else, it returns -ve
+
+				int x = sys_createSharedObject(sharedVarName,size,isWritable, (void*)block->sva);
+
 	//	4) If the Kernel successfully creates the shared variable, return its virtual address
-		if(x == E_NO_SHARE || x == E_SHARED_MEM_EXISTS) // not created
-		{
-			return NULL;
+				if(x == E_NO_SHARE || x == E_SHARED_MEM_EXISTS) // not created
+					return NULL;
+
+				VAs[index] = block->sva;
+				sharedObjectIDs[index] = x;
+				index++;
+
+				insert_sorted_allocList(block);
+				return (void *) block->sva;
+			}
 		}
-		insert_sorted_allocList(block);
-		return (void *) block->sva;
-	}
 	//This function should find the space of the required range
 	// ******** ON 4KB BOUNDARY ******************* //
+
 	//Use sys_isUHeapPlacementStrategyFIRSTFIT() to check the current strategy
-	//Else, return NULL
+
+	//	   Else, return NULL
 	return (void*)NULL;
 }
 
@@ -193,45 +200,54 @@ void* sget(int32 ownerEnvID, char *sharedVarName)
 	InitializeUHeap();
 	//==============================================================
 
-	// TODO: [PROJECT MS3] [SHARING - USER SIDE] sget()
+	//TODO: [PROJECT MS3] [SHARING - USER SIDE] sget()
 	// Write your code here, remove the panic and write your code
-	// panic("sget() is not implemented yet...!!");
+//	panic("sget() is not implemented yet...!!");
+
 	// Steps:
 	//	1) Get the size of the shared variable (use sys_getSizeOfSharedObject())
 	uint32 size = sys_getSizeOfSharedObject(ownerEnvID, sharedVarName);
 	//	2) If not exists, return NULL
 	if(size < 0)
-	{
 		return NULL;
-	}
+
+
 	size = ROUNDUP(size, PAGE_SIZE);
+
+//cprintf("size %d", size);
 	uint32 va = LIST_FIRST(&FreeMemBlocksList)->sva;
 	if (USER_HEAP_MAX-va< size)
-	{
 		return (void *) NULL;
-	}
 	//	3) Implement FIRST FIT strategy to search the heap for suitable space
 	//		to share the variable (should be on 4 KB BOUNDARY)
-	struct MemBlock* block = alloc_block_FF(size);
+	else if (sys_isUHeapPlacementStrategyFIRSTFIT() == 1) {
+		struct MemBlock* block = alloc_block_FF(size);
+
 	//	4) if no suitable space found, return NULL
 	if (block == NULL)
-	{
 		return (void*)NULL;
-	}
 	//	 Else,
-	va = block->sva;
+	else{
+		va = block->sva;
+
 	//	5) Call sys_getSharedObject(...) to invoke the Kernel for sharing this variable
 	//		sys_getSharedObject(): if succeed, it returns the ID of the shared variable. Else, it returns -ve
-	int ID = sys_getSharedObject(ownerEnvID,sharedVarName,(void*) va);
-	if(ID == E_SHARED_MEM_NOT_EXISTS)
-	{
-		return (void*)NULL;
-	}
+		int ID = sys_getSharedObject(ownerEnvID,sharedVarName,(void*) va);
+		if(ID == E_SHARED_MEM_NOT_EXISTS)
+			return (void*)NULL;
 	//	6) If the Kernel successfully share the variable, return its virtual address
-	insert_sorted_allocList(block);
-	return (void *) block->sva;
-	//Else, return NULL
+
+		VAs[index] = va;
+		sharedObjectIDs[index] = ID;
+		index++;
+
+		insert_sorted_allocList(block);
+		return (void *) block->sva;
+		}
+	}
+	//	   Else, return NULL
 	//
+	return (void*)NULL;
 	//This function should find the space for sharing the variable
 	// ******** ON 4KB BOUNDARY ******************* //
 
@@ -284,13 +300,26 @@ void *realloc(void *virtual_address, uint32 new_size)
 
 void sfree(void* virtual_address)
 {
-	// TODO: [PROJECT MS3 - BONUS] [SHARING - USER SIDE] sfree()
+	//TODO: [PROJECT MS3 - BONUS] [SHARING - USER SIDE] sfree()
 
 	// Write your code here, remove the panic and write your code
-	panic("sfree() is not implemented yet...!!");
+//	panic("sfree() is not implemented yet...!!");
+	uint32 i = 0;
+	for(; i< index;i++)
+		if(VAs[i] == (uint32)virtual_address)
+			break;
+
+    struct MemBlock *block = find_block(&AllocMemBlocksList, (uint32 )virtual_address);
+    if (block != NULL)
+    {
+    	int x = sys_freeSharedObject(sharedObjectIDs[i], virtual_address);
+    	if(x == E_SHARED_MEM_NOT_EXISTS)
+    		return;
+
+        LIST_REMOVE(&AllocMemBlocksList, block);
+        insert_sorted_with_merge_freeList(block);
+    }
 }
-
-
 
 
 //==================================================================================//

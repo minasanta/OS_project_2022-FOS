@@ -15,14 +15,20 @@ void _main(void)
 	int32 envIdProcessA = sys_create_env("ef_ms1", (myEnv->page_WS_max_size),(myEnv->SecondListSize), 50);
 	int32 envIdProcessB = sys_create_env("ef_ms2", (myEnv->page_WS_max_size)-3,(myEnv->SecondListSize), 50);
 
-	//Run 3 processes
+	rsttst();
+
+	//Run 2 processes
 	sys_run_env(envIdProcessA);
 	sys_run_env(envIdProcessB);
 
 	env_sleep(30000);
+
+	//to ensure that the slave environments completed successfully
+	while (gettst()!=2) ;// panic("test failed");
+
 	cprintf("\n---# of free frames after running programs = %d\n", sys_calculate_free_frames());
 
-	//Kill the 3 processes
+	//Kill the 2 processes
 	sys_destroy_env(envIdProcessA);
 	sys_destroy_env(envIdProcessB);
 
@@ -31,8 +37,8 @@ void _main(void)
 	int usedDiskPages_after = sys_pf_calculate_allocated_pages() ;
 
 	if ((freeFrames_after - freeFrames_before) != 0) {
-		cprintf("\n---# of free frames after closing running programs not as before running = %d\n",
-				freeFrames_after);
+		cprintf("\n---# of free frames after closing running programs not as before running = %d\ndifference = %d\n",
+				freeFrames_after, freeFrames_after - freeFrames_before);
 		panic("env_free() does not work correctly... check it again.");
 	}
 

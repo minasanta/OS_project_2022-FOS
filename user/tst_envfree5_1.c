@@ -26,7 +26,8 @@ void _main(void)
 	int usedDiskPages_after = sys_pf_calculate_allocated_pages() ;
 
 	if ((freeFrames_after - freeFrames_before) != 0) {
-		cprintf("\n---# of free frames after closing running programs not as before running = %d\n", freeFrames_after);
+		cprintf("\n---# of free frames after closing running programs not as before running = %d\ndifference = %d\n",
+				freeFrames_after, freeFrames_after - freeFrames_before);
 		panic("env_free() does not work correctly... check it again.");
 	}
 

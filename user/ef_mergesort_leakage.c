@@ -113,6 +113,10 @@ void _main(void)
 		sys_enable_interrupt();
 
 	} while (Chose == 'y');
+
+	//To indicate that it's completed successfully
+	inctst();
+
 }
 
 

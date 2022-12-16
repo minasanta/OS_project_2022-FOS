@@ -49,6 +49,10 @@ _main(void)
 	/*[6] PRINT X*/
 	cprintf("Final value of X = %d\n", *X);
 
+	//ensure that X has the expected value (=11)
+	if (*X != 11)
+		panic("Final value of X is not correct. Semaphore and/or shared variables are not working correctly\n");
+
 	int32 parentenvID = sys_getparentenvid();
 	if(parentenvID > 0)
 	{

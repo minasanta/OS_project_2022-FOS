@@ -18,6 +18,10 @@ _main(void)
 		}
 		if (fullWS) panic("Please increase the WS size");
 	}
+	/*Dummy malloc to enforce the UHEAP initializations*/
+	malloc(0);
+	/*=================================================*/
+
 	uint32 *x,*y,*z;
 	int32 parentenvID = sys_getparentenvid();
 	//GET: z then y then x, opposite to creation order (x then y then z)

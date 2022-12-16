@@ -4,9 +4,12 @@
 void _main(void)
 {
 	// Testing scenario 4: Freeing the allocated semaphores
-	// Testing removing the shared variables
-	int *numOfFinished = smalloc("finishedCount", sizeof(int), 1) ;
-	*numOfFinished = 0 ;
+//	int *numOfFinished = smalloc("finishedCount", sizeof(int), 1) ;
+//	*numOfFinished = 0 ;
+
+	int envID = sys_getenvid();
+
+	sys_createSemaphore("depend0", 0);
 
 	int freeFrames_before = sys_calculate_free_frames() ;
 	int usedDiskPages_before = sys_pf_calculate_allocated_pages() ;
@@ -16,7 +19,12 @@ void _main(void)
 
 	sys_run_env(envIdProcessA);
 
-	while (*numOfFinished != 1) ;
+	sys_waitSemaphore(envID, "depend0") ;
+
+	int semval = sys_getSemaphoreValue(envID, "depend0");
+	if (semval != 0 )
+		cprintf("Error: wrong semaphore value... please review your semaphore code again...");
+
 	cprintf("\n---# of free frames after running programs = %d\n", sys_calculate_free_frames());
 
 	sys_destroy_env(envIdProcessA);
@@ -26,8 +34,8 @@ void _main(void)
 	int usedDiskPages_after = sys_pf_calculate_allocated_pages() ;
 
 	if ((freeFrames_after - freeFrames_before) != 0) {
-		cprintf("\n---# of free frames after closing running programs not as before running = %d\n",
-				freeFrames_after);
+		cprintf("\n---# of free frames after closing running programs not as before running = %d\ndifference = %d\n",
+				freeFrames_after,freeFrames_after - freeFrames_before);
 		panic("env_free() does not work correctly... check it again.");
 	}
 

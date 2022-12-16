@@ -29,20 +29,22 @@ _main(void)
 	int sem1val = sys_getSemaphoreValue(envID, "cs1");
 	int sem2val = sys_getSemaphoreValue(envID, "depend1");
 	if (sem2val == 0 && sem1val == 1)
-		cprintf("Congratulations!! Test of Semaphores [1] completed successfully!!\n\n\n");
+		cprintf("Test of Semaphores is finished!!\n\n\n");
 	else
 		cprintf("Error: wrong semaphore value... please review your semaphore code again...");
 
 	int32 parentenvID = sys_getparentenvid();
 	if(parentenvID > 0)
 	{
-		//Get the check-finishing counter
-		int *finishedCount = NULL;
-		finishedCount = sget(parentenvID, "finishedCount") ;
 		sys_destroy_env(id1);
 		sys_destroy_env(id2);
 		sys_destroy_env(id3);
-		(*finishedCount)++ ;
+		sys_signalSemaphore(parentenvID, "depend0") ;
+
+		//Get the check-finishing counter
+//		int *finishedCount = NULL;
+//		finishedCount = sget(parentenvID, "finishedCount") ;
+//		(*finishedCount)++ ;
 	}
 
 	return;
