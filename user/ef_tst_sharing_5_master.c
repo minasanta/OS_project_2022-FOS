@@ -74,14 +74,18 @@ _main(void)
 		sys_run_env(envIdSlaveB1);
 		sys_run_env(envIdSlaveB2);
 
-		env_sleep(4000); //give slaves time to catch the shared object before removal
+		//env_sleep(4000); //give slaves time to
+		//to ensure that the slaves catch the shared object before removal
+		while (gettst()!=2) ;// panic("test failed");
 
 		int freeFrames = sys_calculate_free_frames() ;
 
 		sfree(z);
+		inctst();
 		cprintf("Master env removed z\n");
 
 		sfree(x);
+		inctst();
 		cprintf("Master env removed x\n");
 
 		int diff = (sys_calculate_free_frames() - freeFrames);
@@ -90,6 +94,9 @@ _main(void)
 
 		int* finish_children = smalloc("finish_children", sizeof(int), 1);
 		*finish_children = 0;
+
+		//to ensure that the other environments completed successfully
+		while (gettst()!=6) ;// panic("test failed");
 
 		//To indicate that it's completed successfully
 		inctst();

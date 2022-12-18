@@ -282,13 +282,18 @@ int createSharedObject(int32 ownerID, char* shareName, uint32 size, uint8 isWrit
 
 	struct Share *sharedObject = NULL;
 
+	bool mem_exist = 0;
+
 	for (int i = 0; i <= MAX_SHARES; ++i)
 	{
 		if (shares[i].empty)
 			break;
 
 		if(strcmp(shares[i].name, shareName) == 0)
+		{
 			return E_SHARED_MEM_EXISTS;
+			break;
+		}
 
 	}
 
@@ -302,15 +307,18 @@ int createSharedObject(int32 ownerID, char* shareName, uint32 size, uint8 isWrit
 
 	uint32 va = (uint32) virtual_address;
 	int i = 0;
-
 	uint32 s = size;
 	while(s > 0)
 	{
 		struct FrameInfo *frame = NULL;
 		allocate_frame(&frame);
-		map_frame(myenv->env_page_directory, frame,va,PERM_USER| PERM_WRITEABLE);
+
+//		if(isWritable)
+			map_frame(myenv->env_page_directory, frame,va,PERM_USER| PERM_WRITEABLE);
+//		else
+//			map_frame(myenv->env_page_directory, frame,va,PERM_USER);
+
 		add_frame_to_storage(sharedObject->framesStorage, frame, i);
-		frame->va = va;
 		s -= PAGE_SIZE;
 		va += PAGE_SIZE;
 		i++;
@@ -320,8 +328,8 @@ int createSharedObject(int32 ownerID, char* shareName, uint32 size, uint8 isWrit
 	strcpy(sharedObject->name, shareName);
 	sharedObject->size = size;
 	sharedObject->isWritable = isWritable;
-
 	sharedObject->references = 1;
+	myenv->ENV_MAX_SHARES++;
 
 	return index;
 }
@@ -363,6 +371,7 @@ int getSharedObject(int32 ownerID, char* shareName, void* virtual_address)
 			va+=PAGE_SIZE;
 	}
 	shares[sharedID].references++;
+
 	return sharedID;
 
 }
@@ -436,6 +445,7 @@ int freeSharedObject(int32 sharedObjectID, void *startVA)
 	{
 		free_share_object(sharedID);
 	}
+	myenv->ENV_MAX_SHARES--;
 	//	6) Flush the cache "tlbflush()"
 	tlbflush();
 	return 0;

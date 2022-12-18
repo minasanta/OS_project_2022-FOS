@@ -422,9 +422,33 @@ void env_free(struct Env *e)
 	// [3] free the PAGE working set itself from the main memory
 	kfree((void*) e->ptr_pageWorkingSet);
 	// [4] free the MemBlockNodes array of the USER HEAP dynamic allocator [if exists]
-
+	uint32 va = 0x7FDFF000;
+	while (1 == 1)
+	{
+		uint32 *tbl;
+		struct FrameInfo* frame = get_frame_info(e->env_page_directory, va, &tbl);
+		if (frame == NULL)
+			break;
+		unmap_frame(e->env_page_directory, va);
+		va+=PAGE_SIZE;
+	}
 	// [5] Free Shared variables [if any]
+	uint32 index = 0;
+	if(e->ENV_MAX_SHARES != 0)
+	while(index < MAX_SHARES)
+	{
+		if(shares[index].ownerID == e->env_id)
+			free_share_object(index);
+
+		else if(shares[index].ownerID == e->env_parent_id)
+			for(int i = 0; i < shares[index].references;i++)
+				if(kheap_virtual_address(EXTRACT_ADDRESS(shares[index].framesStorage[i])) != 0)
+					unmap_frame(e->env_page_directory,kheap_virtual_address(EXTRACT_ADDRESS(shares[index].framesStorage[i])));
+
+		index++;
+	}
 	// [6] Free Semaphores [if any]
+	kfree((void *) (MAX_SEMAPHORES*sizeof(struct Semaphore)));
 	// [7] Free all TABLES from the main memory
 	for (uint32 i = 0; i < USER_TOP; i += PAGE_SIZE*1024)
 	{
@@ -443,7 +467,6 @@ void env_free(struct Env *e)
 	// [8] free the page DIRECTORY from the main memory
 	kfree((void*) e->env_page_directory);
 	// [9] remove this program from the page file
-//	pf_remove_env_page(e,e->en)
 	/*(ALREADY DONE for you)*/
 	pf_free_env(e); /*(ALREADY DONE for you)*/ // (removes all of the program pages from the page file)
 	/*========================*/
@@ -453,8 +476,6 @@ void env_free(struct Env *e)
 	free_environment(e); /*(ALREADY DONE for you)*/ // (frees the environment (returns it back to the free environment list))
 	/*========================*/
 }
-
-
 //============================
 // 4) PLACE ENV IN EXIT QUEUE:
 //============================

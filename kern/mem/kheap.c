@@ -132,12 +132,10 @@ void kfree(void* virtual_address) {
 	if (block != NULL)
 	{
 		for (int i = 0; i < block->size / PAGE_SIZE; i++) {
-			uint32 physical_address = virtual_to_physical(ptr_page_directory,
-					va);
+			uint32 physical_address = virtual_to_physical(ptr_page_directory,va);
 			struct FrameInfo *ptr_frame_info;
 			ptr_frame_info = to_frame_info(physical_address);
 			free_frame(ptr_frame_info);
-
 			unmap_frame(ptr_page_directory, va);
 
 			va += PAGE_SIZE;
