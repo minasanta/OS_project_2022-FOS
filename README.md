@@ -43,8 +43,8 @@ In this project we created
 | Name  | Account |
 | ----- | ------- |
 | Mina Nabil  | @<a href="https://github.com/minasanta/" target="_blank">minasanta</a> |
-| Mehrael Ashraf  | @<a href="https://github.com/Mehrael/" Mina927="_blank">Mehrael</a> |
-| Mina Adil  | @<a href="https://github.com/minasanta/" Mina927="_blank">Mina927</a> |
+| Mehrael Ashraf  | @<a href="https://github.com/Mehrael/" target="_blank">Mehrael</a> |
+| Mina Adil  | @<a href="https://github.com/Mina927/" target="_blank">Mina927</a> |
 | Filobateer Essam  | @<a href="https://github.com/FilobateerEssam/" target="_blank">FilobateerEssam</a> |
 | Martina Sabry  | ___ |
 | Marlen Tawadrous  | ___ |
