@@ -48,6 +48,6 @@ In this project we created
 | Filobateer Essam  | @<a href="https://github.com/FilobateerEssam/" target="_blank">FilobateerEssam</a> |
 | Martina Sabry  | ___ |
 | Marlen Tawadrous  | ___ |
-<a href="https://github.com/minasanta/OS_project_2022-FOS-">
-  <img src="https://contrib.rocks/image?repo=minasanta/OS_project_2022-FOS-" />
+<a href="https://github.com/minasanta/OS_project_2022-FOS">
+  <img src="https://contrib.rocks/image?repo=minasanta/OS_project_2022-FOS" />
 </a> 
